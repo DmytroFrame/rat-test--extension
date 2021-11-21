@@ -1,0 +1,18 @@
+{
+    "name": "Rat test",
+    "description": "parser tests for ukd",
+    "version": "1.0.0",
+    "manifest_version": 2,
+    "content_scripts": [
+        {
+            "matches": ["https://online.ukd.edu.ua/mod/quiz/review.php*"],
+            "js": ["script.js"],
+            "run_at": "document_end"
+        }
+    ],
+    "icons": {
+        "16": "icons/16.png",
+        "48": "icons/48.png",
+        "128": "icons/128.png"
+    }
+}
