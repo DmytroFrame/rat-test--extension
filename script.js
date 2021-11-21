@@ -89,6 +89,41 @@ function getTestsResult() {
         }
     }
 
+    function getTestTypeSelect(testId) {
+        function getTitle(testPath, index) {
+            return document.querySelector(
+                `#question-${testPath} > div.content > div.formulation.clearfix > div.ablock > table > tbody > tr:nth-child(${index}) > td.text`
+            ).textContent
+        }
+    
+        function getSelect(testPath, index) {
+            const element = document.querySelector(`#menuq${testPath.replace('-', '\\:')}_sub${index}`)
+            return element.options[element.selectedIndex].text
+        }
+    
+        function getAllOptions(testPath) {
+            optionArray = []
+            const element = document.querySelector(`#menuq${testPath.replace('-', '\\:')}_sub0`)
+            for (let item of element.options) {
+                optionArray.push(item.text)
+            }
+            return optionArray
+        }
+        
+        const userSelect = []
+        const optionSelect  = []
+        optionSelect.push(getAllOptions(testId))
+        const thisTest = document.querySelector(`#question-${testId} > div.content > div.formulation.clearfix > div.ablock > table > tbody`)
+
+        for (let i = 0; i < thisTest.childElementCount; i++) {
+            const title = getTitle(testId, i +1)
+            userSelect.push(`${title } → ${ getSelect(testId, i) }`)
+            optionSelect.push(title)
+        }
+        return {optionSelect, userSelect}
+        
+    }
+
     function parsingTest(test) {
         const testResult =  {
             testType: null,
@@ -120,6 +155,11 @@ function getTestsResult() {
         if (testResult.testType === "input") {
             testResult.selectOptions.push(test.querySelector("div.content > div.formulation.clearfix > div ").innerHTML.split('value="')[1].split('"') )
 
+        } else if (testResult.testType === "select") {
+            const {optionSelect, userSelect} = getTestTypeSelect(test.id.replace('question-', ''))
+            testResult.selectOptions = optionSelect
+            testResult.options = userSelect
+
         } else {
             const testArray = test.querySelector("div.content > div.formulation.clearfix > div.ablock")
             arrayFilterAndPush(testArray, testResult.options)
@@ -131,13 +171,13 @@ function getTestsResult() {
                 } 
             } catch (error) {
                 console.log('fuck', error)
-            }              
+            }   
         }
         return testResult        
     }
 
     const tests = []
-    for (test of document.querySelectorAll('.deferredfeedback')) {
+    for (let test of document.querySelectorAll('.deferredfeedback')) {
         try {
             tests.push(parsingTest(test))
         } catch (error) {
@@ -156,18 +196,18 @@ console.log(path)
 console.table(info)
 console.table(tests)
 
-fetch("http://localhost:3000/", {
-    "method": "POST",
-    "headers": {
-        "Content-Type": "application/json"
-    },
-    "body": JSON.stringify({info, path, tests})
-    })
-    .then(response => {
-    console.log(response);
-    })
-    .catch(err => {
-    console.error(err);
-    });
+// fetch("http://localhost:3000/", {
+//     "method": "POST",
+//     "headers": {
+//         "Content-Type": "application/json"
+//     },
+//     "body": JSON.stringify({info, path, tests})
+//     })
+//     .then(response => {
+//     console.log(response);
+//     })
+//     .catch(err => {
+//     console.error(err);
+//     });
 
 
